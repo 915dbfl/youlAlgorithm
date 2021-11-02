@@ -1,38 +1,40 @@
 #21.11.01
+#시간초과
 import sys
-N, M, V = map(int, input().split())
-lst = []
-lst1 = []
-lst2 = []
+N, M, V = map(int, sys.stdin.readline().split())
 order_bfs = [V]
-key_index = 0
+order_dfs = [V]
+key = 0
+dic = {}
 for i in range(M):
-  lst.append(list(map(int, sys.stdin.readline().split())))
+  temp1, temp2 = map(int, sys.stdin.readline().split())
+  if temp1 not in dic.keys():
+    dic[temp1] = []
+  if temp2 not in dic.keys():
+    dic[temp2] = []
+  dic[temp1].append(temp2)
+  dic[temp2].append(temp1)
 
-lst.sort(key= lambda i : (i[0], i[1]))
-for i in lst:
-  lst1.append(i[0])
-  lst2.append(i[1])
+for i in dic.keys():
+  dic[i].sort()
 
-while len(lst1) > 0:
-  V = order_bfs[key_index]
-  if V in lst1:
-    idx = lst1.index(V)
-    if lst2[idx] not in order_bfs:
-      order_bfs.append(lst2[idx])
-    lst1.pop(idx)
-    lst2.pop(idx)
-  elif V in lst2:
-    idx = lst2.index(V)
-    if lst1[idx] not in order_bfs:
-      order_bfs.append(lst1[idx])
-    lst1.pop(idx)
-    lst2.pop(idx)
-  else:
-    key_index += 1
+print(V, end=" ")
+while len(order_bfs) < len(dic.keys()):
+  for i in dic[V]:
+    if i not in order_bfs:
+      order_bfs.append(i)
+      print(i, end = " ")
+  key += 1
+  V = order_bfs[key]
 
+print("")
+print(order_dfs[0], end=" ")
+V = order_dfs[0]
 
-
-print(order_bfs)
-  
-
+while len(order_dfs) < len(dic.keys()):
+  for i in dic[V]:
+    if i not in order_dfs:
+      order_dfs.append(i)
+      print(i, end=" ")
+      V = i
+      break
