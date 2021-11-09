@@ -1,40 +1,38 @@
 #21.11.01
 #시간초과
 import sys
-N, M, V = map(int, sys.stdin.readline().split())
-order_bfs = [V]
-order_dfs = [V]
-key = 0
-dic = {}
-for i in range(M):
-  temp1, temp2 = map(int, sys.stdin.readline().split())
-  if temp1 not in dic.keys():
-    dic[temp1] = []
-  if temp2 not in dic.keys():
-    dic[temp2] = []
-  dic[temp1].append(temp2)
-  dic[temp2].append(temp1)
+from collections import deque
+def dfs(v):
+  global visit_lst1
+  print(v, end=" ")
+  visit_lst1[v] = 1
+  for i in range(1, N+1):
+    if visit_lst1[i] == 0 and graph[v][i] == 1:
+      dfs(i)
 
-for i in dic.keys():
-  dic[i].sort()
+def bfs(v):
+  global visit_lst2
+  que = deque()
+  que.append(v)
+  visit_lst2[v] = 1
+  while que:
+    temp = que.popleft()
+    print(temp, end=" ")
+    for i in range(1, N+1):
+      if visit_lst2[i] == 0 and graph[temp][i] == 1:
+        que.append(i)
+        visit_lst2[i] = 1
 
-print(V, end=" ")
-while len(order_bfs) < len(dic.keys()):
-  for i in dic[V]:
-    if i not in order_bfs:
-      order_bfs.append(i)
-      print(i, end = " ")
-  key += 1
-  V = order_bfs[key]
 
-print("")
-print(order_dfs[0], end=" ")
-V = order_dfs[0]
+N, M, V= map(int, sys.stdin.readline().split())
+graph = [[0] * (N+1) for _ in range(N+1)]
+visit_lst1 = [0 for i in range(N+1)]
+visit_lst2 = [0 for i in range(N+1)]
 
-while len(order_dfs) < len(dic.keys()):
-  for i in dic[V]:
-    if i not in order_dfs:
-      order_dfs.append(i)
-      print(i, end=" ")
-      V = i
-      break
+for _ in range(M):
+  a, b = map(int, sys.stdin.readline().rstrip().split())
+  graph[a][b] = graph[b][a] = 1
+
+dfs(V)
+print()
+bfs(V)
