@@ -3,27 +3,14 @@
 import sys
 l = int(input())
 nums = list(map(int, sys.stdin.readline().rstrip().split()))
-result = [1 for i in range(l)]
-max = 0
+dp = [1 for i in range(l)]
 
 for i in range(1, l):
-  m = 0
-  if nums[i] > nums[i-1]:
-    result[i] = nums[i-1] + 1
-  else:
-    for j in range(0, i):
-      val = 0
-      for k in range(j, i):
-        if nums[k] < nums[k-1]:
-          if nums[i] > nums[k] and nums[k] > val:
-            result[i] += 1
-            val = nums[k]
-      if m < result[i]:
-        m = result[i]
-      result[i] = 1
-    result[i] = m
-  if max < result[i]:
-    max = result[i]
+  m = 1
+  for j in range(0, i):
+    if nums[i] > nums[j]:
+      if m < dp[j]+1:
+        m = dp[j]+1
+  dp[i] = m
 
-print(max)
-
+print(max(dp))
