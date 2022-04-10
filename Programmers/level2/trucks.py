@@ -6,15 +6,13 @@ from collections import deque
 
 def solution(bridge_length, weight, truck_weights):
     dq = deque()
-    dq.append([truck_weights[0],0])
-    idx = 1
+    dq.append([truck_weights.pop(0),0])
     answer = 0
-    while idx < len(truck_weights):
+    while truck_weights:
         answer += 1
         if answer - dq[0][1] == bridge_length:
             dq.popleft()  
-        if sum([x[0] for x in dq]) + truck_weights[idx] <= weight:
-            dq.append([truck_weights[idx], answer])
-            idx += 1
+        if sum([x[0] for x in dq]) + truck_weights[0] <= weight:
+            dq.append([truck_weights.pop(0), answer])
 
     return answer + bridge_length + 1 if answer != 0 else bridge_length + 1
