@@ -16,3 +16,11 @@ def solution(n, left, right):
         num = num+1 if num != n else 1
 
     return answer
+
+
+# best 풀이 : left, right 인덱스 활용하기
+def solution(n, left, right):
+    answer = []
+    for i in range(left, right+1):
+        answer.append(max(i//n, i%n) + 1)
+    return answer
