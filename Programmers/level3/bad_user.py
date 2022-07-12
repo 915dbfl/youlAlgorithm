@@ -1,7 +1,7 @@
 #22.07.11
 #불량 사용자
 
-# 오답
+# 내 풀이
 import re
 answer = set()
 dic = dict()
@@ -30,10 +30,32 @@ def solution(user_id, banned_id):
     for i in banned_id:
         case = []
         parts = i.split("*")
-        regex = '[a-z1-9]+'.join(parts)
+        regex = '[a-z0-9]'.join(parts)
         for j in user_id:
             if(re.match(regex, j) != None and len(i) == len(j)):
                 case.append(j)
         cases.append(case)
     getAnswer(cases, 0, [])
+    return len(answer)
+
+# product 사용하기
+# O(N^2)
+import re
+from itertools import product
+
+def solution(user_id, banned_id):
+    cases, answer = [], []
+    for i  in banned_id:
+        case = []
+        parts = i.split("*")
+        regex = '[a-z0-9]'.join(parts)
+        for j in user_id:
+            if re.match(regex, j) != None and len(i) == len(j):
+                case.append(j)
+        cases.append(case)
+    results = list(product(*cases))
+    for result in results:
+        tmp = set(result)
+        if len(tmp) == len(banned_id) and tmp not in answer:
+            answer.append(tmp)
     return len(answer)
