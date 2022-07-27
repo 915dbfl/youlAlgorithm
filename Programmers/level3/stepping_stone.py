@@ -2,6 +2,7 @@
 #징검다리 건너기
 
 #효율성 두 개 통과 못함
+#시간복잡도 = stone 배열의 크기 * stone 배열의 크기 = 20만 * 20만
 def solution(stones, k):
     m = 200000000
     size = len(stones)
@@ -28,3 +29,27 @@ def solution(stones, k):
         if tmp >= k:
             m = min(m, stones[i])
     return m
+
+# 이분탐색
+# 시간복잡도 = log(200000000) = 27-28
+def solution(stones, k):
+    start = 1
+    end = max(stones)
+    
+    while start <= end:
+        mid = (start+end)//2
+        count = 0
+        for i in stones:
+            if count < k:
+                if i-mid <= 0:
+                    count += 1
+                else:
+                    count = 0
+            else:
+                break
+        if count < k:
+            start = mid+1
+        else:
+            end = mid-1
+            result = mid
+    return result
