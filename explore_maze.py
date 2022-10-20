@@ -63,3 +63,36 @@ def bfs():
   print(answer)
 
 bfs()
+
+# bfs 알고리즘(2)
+import sys
+from collections import deque
+
+input = sys.stdin.readline
+
+N, M = map(int, input().split())
+graph = []
+
+for _ in range(N):
+  graph.append(list(map(int, input().rstrip())))
+
+dx = [-1, 1, 0, 0]
+dy = [0, 0, -1, 1]
+
+def bfs():
+  dq = deque([[0, 0]])
+
+  while dq:
+    x, y = dq.popleft()
+
+    for i in range(4):
+      nx = x + dx[i]
+      ny = y + dy[i]
+
+      if 0<=nx<N and 0<=ny<M and graph[nx][ny] == 1:
+        graph[nx][ny] = graph[x][y] + 1
+        dq.append([nx, ny])
+
+  return graph[N-1][M-1]
+
+print(bfs())
