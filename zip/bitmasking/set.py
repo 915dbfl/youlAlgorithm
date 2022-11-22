@@ -1,7 +1,7 @@
 #22.11.11
 #집합
 #class3/실버5
-#집합
+#비트마스킹
 
 import sys
 
@@ -58,4 +58,31 @@ for _ in range(n):
       else:
         s.add(val)
 
-# https://travelbeeee.tistory.com/451 : 비트마스킹
+# 비트마스킹
+import sys
+
+s = 0
+n = int(input())
+answer = 0
+
+for _ in range(n):
+  command = sys.stdin.readline().rstrip()
+
+  if command == "all":
+    answer = (1<<20)-1
+  elif command == "empty":
+    answer = 0
+  else:
+    op, val = command.split()
+    val = int(val)-1
+    if op == "add":
+      answer |= (1<<val)
+    elif op == "remove":
+      answer &= ~(1<<val)
+    elif op == "check":
+      if answer & (1<<val) != 0:
+        print(1)
+      else:
+        print(0)
+    else:
+      answer ^= (1<<val)
