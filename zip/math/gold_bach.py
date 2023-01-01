@@ -26,3 +26,26 @@ for _ in range(t):
     else:
       a -= 1
       b += 1
+
+# 에라토스테네스의 채 사용하기
+import sys
+input = sys.stdin.readline
+
+t = int(input())
+lst = [False, False] + [True]*10000
+
+for i in range(2, 101):
+  if lst[i]:
+    lst[i*2::i] = [False]*len(lst[i*2::i])
+
+for _ in range(t):
+  n = int(input())
+
+  a = n//2
+  b = a
+  while 1:
+    if lst[a] and lst[b]:
+      print(a, b)
+      break
+    a -= 1
+    b += 1
