@@ -5,17 +5,18 @@
 
 import sys
 from heapq import heappop, heappush
+input = sys.stdin.readline
 
-N = int(sys.stdin.readline())
-h = []
+n = int(input())
+heap = []
 
-for _ in range(N):
-  num = int(sys.stdin.readline())
+for _ in range(n):
+  x = int(input())
 
-  if num == 0:
-    try:
-      print(heappop(h))
-    except:
+  if x == 0:
+    if len(heap) == 0:
       print(0)
+    else:
+      print(heappop(heap))
   else:
-    heappush(h, num)
+    heappush(heap, x)
