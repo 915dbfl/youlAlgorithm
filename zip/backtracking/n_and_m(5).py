@@ -14,24 +14,19 @@ for case in permutations(lst, m):
   print(*case)
 
 #백트래킹
-import sys
-sys.setrecursionlimit(10**4)
+n, m = map(int, input().split())
+lst = list(map(int, input().split()))
+lst.sort()
+nums = []
 
 def dfs():
-  if len(lst) == m:
-    print(*lst)
-    return
-  else:
-    for num in nums:
-      if num not in lst:
-        lst.append(num)
-        dfs()
-        lst.pop()
-
-n, m = map(int, input().split())
-nums = list(map(int, input().split()))
-nums.sort()
-
-lst = []
+   if len(nums) == m:
+      print(*nums)
+   else:
+      for n in lst:
+         if n not in nums:
+            nums.append(n)
+            dfs()
+            nums.pop()
 
 dfs()
