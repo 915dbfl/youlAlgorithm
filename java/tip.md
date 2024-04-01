@@ -1,8 +1,23 @@
 ## 아아 java 코테 기본 문법 지금부터 정리하겠습니다.
 
 ## tip 나열
-- 백준에서는 class명이 Main이어야 함.
+- 1초에 1억 번의 연산 진행
+- 백준에서는 class명이 Main이어야 함
 - bufferedReader/Writer를 쓰려면 IOException을 처리해줘야 함
+- return; -> 해당 함수만 종료(단, main에서 쓰이면 프로그램 전체 중지)
+- System.exit(0) -> 0(정상적인 종료), 그 외(비정상적인 종료)
+- char[] str = br.readeLine().toCharArray
+- System.out.println(String.format("%d %d", a, b))
+- queue는 LinkedList를 활용해 생성함
+- int[] memory = Arrays.stream(br.readLine().split(" "))
+    .mapToInt(Integer::parseInt)
+    .toArray();
+- buf.write(String.valueOf(array[i]));
+- int tmpL = (int)l/3;
+- linkedList vs arrayList
+    - 조회가 많다면? arrayList, 배열로 구현, index로 한 번에 조회
+    - 삽입/삭제가 많다면? linkedList, 노드로 구현, 주소값만 변경해주면 됨
+- java의 max_value = 2147483647, 따라서 해당 범위를 넘어가면 Long으로 선언해줘야 함(overflow도 그냥 틀렸다고 나옴)
 
 ## 입력&출력
 ```java
