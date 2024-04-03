@@ -23,6 +23,7 @@
     - remove / poll
     - element / peek
 - Boolean(null(default)/true/false) vs boolean(true/false(default))
+- Arrays.fill(dist, INF) -> dist 배열 전체 inf로 초기화
 
 ## 입력&출력
 ```java
@@ -52,4 +53,5 @@ import java.io.InputStreamReader;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
+import java.util.StringTokenizer;
 ```
