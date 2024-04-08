@@ -1,0 +1,15 @@
+- 1초에 연산: 2000만번
+- k in dict.keys() -> 시간 복잡도 O(1)
+- nCr = n! / (n-r)! * r!
+- nPr = n! / (n-r)!
+- nC2 = n * (n-1) / 2
+- set 안에는 list가 못 들어감.. tuple은 가능!
+- zip(*matrix)는 세로 배열을 가져옴
+- 파이썬에서 heapq의 default는 최소힙이다.
+- 파이썬의 재귀 기본 depth는 1000이다.
+- combination_with_replacement: 중복조합
+- product: 중복순열
+- "002" -> "2".zfill(3)
+- data = dict(), data.setdefault((a, b, c, d), list())
+- bin()/ 이진수 변환, oct()/ 8진수 변환, hex()/ 16진수 변환
+- int(변환할 수, 변환할 형태), ex. int("0b111100", 2) - 2진수를 10진수로 변환(60)

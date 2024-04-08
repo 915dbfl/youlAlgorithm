@@ -24,6 +24,10 @@
     - element / peek
 - Boolean(null(default)/true/false) vs boolean(true/false(default))
 - Arrays.fill(dist, INF) -> dist 배열 전체 inf로 초기화
+- Array.sort(list, Collections.reverseOrder()): 단순 배열 정렬
+    - 시간복잡도: O(nlogn) / O(n^2)
+- Collections.sort(list), Collections.reverse(list): 클래스 정렬
+    - 시간복잡도: 평균, 최악 모두 O(nlogn)
 
 ## 입력&출력
 ```java
