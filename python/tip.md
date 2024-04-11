@@ -13,3 +13,4 @@
 - data = dict(), data.setdefault((a, b, c, d), list())
 - bin()/ 이진수 변환, oct()/ 8진수 변환, hex()/ 16진수 변환
 - int(변환할 수, 변환할 형태), ex. int("0b111100", 2) - 2진수를 10진수로 변환(60)
+- string find() 왼쪽부터 찾음, rfind() 오른쪽부터 찾음
