@@ -23,3 +23,4 @@
         - E는 항상 V^2보다 작으므로 logE < logV^2 = 2logV, 따라서 하나의 간선을 넣고 빼는 시간복잡도는 O(logV)
         - 전체 시간 복잡도는 O(ElogV)
 - 카탈란 수열 적용: 올바른 괄호 개수 / n+2각형으로 n개의 삼각형 나누는 개수 ...
+- from collections import Counter, 리스트 내에서 숫자 개수 딕셔너리 값으로 반환
