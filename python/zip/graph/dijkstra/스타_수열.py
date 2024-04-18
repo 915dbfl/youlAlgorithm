@@ -1,38 +1,66 @@
+# 오답
+# 특정 교집합을 중심으로 구한 게 아니기 때문에
+# idx를 증가시키는 과정에서 놓치는 부분이 있다 생각!
+from collections import defaultdict
+
+def getStar(a, start):
+    # 스타 수열이 될 수 있는 후보
+    star = defaultdict(int)
+    idx = start
+    
+    while idx < len(a):
+        # 서로 다른 수라면
+        if a[idx] != a[idx-1]:
+            # 스타 수열 후보에 추가
+            star[a[idx]] += 1
+            star[a[idx-1]] += 1
+            # 두개값 건너뜀
+            idx += 2
+        else:
+            idx += 1
+    return star
+
+def getMax(dic):
+    global answer
+    # 스타 수열의 교집합이 될 수 있는 값을 중심으로
+    # 최대 스타 수열의 길이를 구하자
+    for key in dic:
+        answer = max(answer, dic[key]*2)
+
+def solution(a):
+    global answer
+    answer = 0
+    result = getStar(a, 1)
+    getMax(result)
+    
+    result = getStar(a, 2)
+    getMax(result)
+
+    return answer
+
+# 각 교집합이 될 수 있는 값에 대한
+# 스타수열의 최대 길이를 구해야 함
 from collections import Counter
 
-# O(n^2)
 def solution(a):
-    answer = -1
+    star = Counter(a)
+    answer = 0
     
-    numcnt = Counter(a)
-    print(numcnt)
-    
-    # a에 있는 원소 k를 기준으로 스타 배열을 만들 수 있는지 검사
-    for k in numcnt.keys():
+    for key in star:
+        # 최대 교집합의 수보다 적으면 continue
+        if star[key] < answer:
+            continue
         
-        # 이미 구해진 answer보다 배열 속 k의 개수가 더 작은지 확인
-        if numcnt[k] < answer: continue
-        
-        # k의 등장횟수 확인
         cnt = 0
-        idx = 0
-        while idx < len(a) - 1:
-            # k가 포함되지 않거나 서로 값이 동일하면 스타배열 불가
-            if (a[idx] != k and a[idx+1] != k) or (a[idx] == a[idx]+1):
+        idx = 1
+        while idx < len(a):
+            if (a[idx] != key and a[idx-1] != key) or (a[idx] == a[idx-1]):
                 idx += 1
                 continue
-            
-            # 스타 배열이 되는 경우 cnt 업데이트
+                
             cnt += 1
-            # 해당 두 값 다음을 확인하기 위해 두칸 점프
             idx += 2
             
-        answer = max(cnt, answer)
+        answer = max(answer, cnt)
         
-    return answer*2 if answer != -1 else answer
-
-def solution(a):
-    answer = 0
-    n = len(a)
-    chk = [-1] * (n+2)
-    a = [a[0]] + a + a[-1]
+    return answer*2
