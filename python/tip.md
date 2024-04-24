@@ -25,3 +25,4 @@
 - 카탈란 수열 적용: 올바른 괄호 개수 / n+2각형으로 n개의 삼각형 나누는 개수 ...
 - from collections import Counter, 리스트 내에서 숫자 개수 딕셔너리 값으로 반환
 - "(-2)/3"(-0.6)와 "(-2)//3"(-1)은 값이 다름. //의 경우 내림 연산을 수행함
+- defaultdict(lambda: defaultdict(set))
