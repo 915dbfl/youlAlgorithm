@@ -26,3 +26,4 @@
 - from collections import Counter, 리스트 내에서 숫자 개수 딕셔너리 값으로 반환
 - "(-2)/3"(-0.6)와 "(-2)//3"(-1)은 값이 다름. //의 경우 내림 연산을 수행함
 - defaultdict(lambda: defaultdict(set))
+- (1~n) nCk값 더하기: 2^n - 1
