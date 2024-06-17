@@ -1,0 +1,4 @@
+- private const val INF = Int.MAX_VALUE
+- 1 until 5(1, 2, 3, 4) / 1..5(1, 2, 3, 4, 5)
+- repeat은 내부적으로 반복문을 호출하지만 그 자체가 반복문이 아니기 때문에 break/continue 사용이 불가하다.
+- 1초 대략적인 연산 횟수 10^8(10억)
