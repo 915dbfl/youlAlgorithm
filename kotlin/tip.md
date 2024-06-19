@@ -4,3 +4,4 @@
 - 1초 대략적인 연산 횟수 10^8(10억)
 - print(ans.joinToString("\n"){it.joinToString("")})
 - print(array.contentToString())
+- char -> int? Character.getNumericValue("1")를 사용
