@@ -5,3 +5,6 @@
 - print(ans.joinToString("\n"){it.joinToString("")})
 - print(array.contentToString())
 - char -> int? Character.getNumericValue("1")를 사용
+- 배열/리스트.size, 문자열.length
+- sumOf / maxOf / minOf 활용하기 (내부적으로 배열임)
+- for문 downTo로 값이 줄어드는 반복문 만들 수 있음
