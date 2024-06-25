@@ -1,50 +1,52 @@
-// 오답
 import kotlin.collections.ArrayDeque
 
 val br = System.`in`.bufferedReader()
 fun main() = with(System.out.bufferedWriter()) {
-
-    var apple = br.readLine().toCharArray()
-    var lover = br.readLine().toCharArray()
+    val apple = br.readLine().toCharArray()
+    val lover = br.readLine().toCharArray()
     val n = apple.size
 
     apple.sort()
-    val appleDq = ArrayDeque<Char>()
-    appleDq.addAll(apple.slice(IntRange(0, n - n/2-1)))
-
     lover.sortDescending()
-    val loverDq = ArrayDeque<Char>()
-    loverDq.addAll(lover.slice(IntRange(0, n/2-1)))
 
-    var turn = 0
-    var idx = 0
-    var rev_idx = n-1
+    val appleDeque = ArrayDeque<Char>()
+    // appleDeque.addAll(apple.slice(IntRange(0, n-n/2)))
+    for (i in 0 until (n - (n/2))) {
+        appleDeque.add(apple[i])
+    }
+    val loverDeque = ArrayDeque<Char>()
+    for (i in 0 until n/2) {
+        loverDeque.add(lover[i])
+    }
 
-    val companyName = Array<Char>(n){' '}
-
+    val answer = CharArray(n)
+    var start = 0
+    var end = n-1
     repeat(n) {
         // 구사과 차례
-        if (turn == 0) {
-            if (loverDq.isEmpty() || appleDq.first() > loverDq.first()) {
-                companyName[rev_idx] = appleDq.removeLast()
-                rev_idx--
+        if (it % 2 == 0) {
+            // apple의 가장 작은 수보다 lover의 가장 큰 수가 작을 경우
+            if (loverDeque.isNotEmpty() && appleDeque.first() >= loverDeque.first()) {
+                answer[end] = appleDeque.removeLast()
+                end--
             } else {
-                companyName[idx] = appleDq.removeFirst()
-                idx++
+                answer[start] = appleDeque.removeFirst()
+                start++
             }
-        // 러버 차례
+
+        // 큐브러버 차례
         } else {
-            if (appleDq.first() > loverDq.first()) {
-                companyName[rev_idx] = loverDq.removeLast()
-                rev_idx--
+            // apple의 가장 작은 수가 lover의 가장 큰 수보다 클 경우
+            if (!appleDeque.isEmpty() && appleDeque.first() >= loverDeque.first()) {
+                answer[end] = loverDeque.removeLast()
+                end--
             } else {
-                companyName[idx] = loverDq.removeFirst()
-                idx++
+                answer[start] = loverDeque.removeFirst()
+                start++
             }
         }
-        turn = (turn + 1) % 2
     }
-    write("${companyName.joinToString("")}")
-    close()
 
+    write("${answer.joinToString("")}")
+    close()
 }
