@@ -7,7 +7,7 @@
 - char -> int? Character.getNumericValue("1")를 사용
 - 배열/리스트.size, 문자열.length
 - sumOf / maxOf / minOf 활용하기 (내부적으로 배열임)
-- for문 downTo로 값이 줄어드는 반복문 만들 수 있음
+- for문 downTo로 값이 줄어드는 반복문 만들 수 있음 (5 downTo 1-> 5, 4, 3, 2, 1)
 - java.util.StringTokenizer -> StringTokenizer(br.readLine())
 - coerceAtLeast, coerceAtMost로 최솟값 / 최댓값 구할 수 있음
 - queue를 사용할거면 linkedList보다 ArrayDeque를 활용하자
