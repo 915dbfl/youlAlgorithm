@@ -1,76 +1,44 @@
-/*
-- 문제에서 유성은 무조건 땅보다 위에 존재하기 때문에
-다음과 같은 테스트 케이스는 들어오지 않는다.
-
-9 9
-.........
-..XXXX...
-..X......
-..X######
-..X.....#
-..XXXX..#
-........#
-##.....##
-#########
-
- */
-
-// 오답
-import java.util.StringTokenizer
-
 val br = System.`in`.bufferedReader()
 val bw = System.out.bufferedWriter()
-var r = 0
-var s = 0
 
-lateinit var before: Array<CharArray>
-lateinit var after: Array<CharArray>
+fun main() {
+    val (r, s) = br.readLine().split(" ").map {it.toInt()}
+    val before = Array(r) {
+        br.readLine().toCharArray()
+    }
 
-fun findMinDis(): Int {
-    var minDis = r+1
-    // O(R*S) = 9000000
-    // 땅과 유성 거리 중 가장 가까운 거리 구하기
+    // 최대 가능한 이동 거리 구하기
+    // 위에서 시작해서 제일먼저 #이 나타나는 곳까지 count해야 함
+    /*
+    5 2
+    X.
+    ..
+    ##
+    .#
+    ##
+     */
+    var moveCnt = r+1
     for (i in 0 until s) {
-        var colDis = 0
-        for (j in r-2 downTo 0) {
-            if (before[j][i] == '.') {
-                colDis++
-            } else if (before[j][i] == 'X') {
-                minDis = minOf(minDis, colDis)
+        var starIdx = -(r+1) // 초기값 설정 주의
+        for (j in 0 until r) {
+            if (before[j][i] == 'X') starIdx = j
+            else if (before[j][i] == '#') { 
+                moveCnt = minOf(moveCnt, j - starIdx -1)
                 break
             }
         }
     }
-    // println(disDp.joinToString("\n") {it.joinToString()})
-    return minDis
-}
 
-fun move(moveCnt: Int) {
-    after = Array(r) {CharArray(s){'.'}}
+    val after = Array(r) {CharArray(s) {'.'}}
 
     for (i in 0 until r) {
         for (j in 0 until s) {
             when(before[i][j]) {
-                'X' -> {
-                    after[i+moveCnt][j] = 'X'
-                }
+                'X' -> after[i+moveCnt][j] = 'X'
                 '#' -> after[i][j] = '#'
             }
         }
     }
-}
-
-fun main() {
-    val st = StringTokenizer(br.readLine())
-    r = st.nextToken().toInt()
-    s = st.nextToken().toInt()
-
-    before = Array(r) {
-        br.readLine().toCharArray()
-    }
-
-    val moveCnt = findMinDis()
-    move(moveCnt)
 
     bw.write("${after.joinToString("\n") {it.joinToString("")}}")
     bw.close()

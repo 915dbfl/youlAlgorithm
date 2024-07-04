@@ -11,3 +11,4 @@
 - java.util.StringTokenizer -> StringTokenizer(br.readLine())
 - coerceAtLeast, coerceAtMost로 최솟값 / 최댓값 구할 수 있음
 - queue를 사용할거면 linkedList보다 ArrayDeque를 활용하자
+- nums = (2..n) -> 쉽개 list 생성하는 법

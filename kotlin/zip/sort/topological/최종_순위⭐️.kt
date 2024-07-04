@@ -73,6 +73,9 @@ fun topologicalSort(): String {
     return answer.joinToString(" ")
 }
 
+// n1, n2만 바꿔도 되는 이유
+// 순위가 바뀌는 경우가 모두 주어지기 때문에 올바르게 주어진다면
+// 바뀌는 순위가 모두 수정된다.
 fun swap(n1: Int, n2: Int) {
     // n2가 n1보다 등수가 높을 경우
     if (!edges[n1][n2]) {
