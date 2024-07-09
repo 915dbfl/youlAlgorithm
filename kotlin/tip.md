@@ -13,3 +13,5 @@
 - queue를 사용할거면 linkedList보다 ArrayDeque를 활용하자
 - nums = (2..n) -> 쉽게 list 생성하는 법
 - "0".repeat(n)로 쉽게 string 생성 가능
+- 비트 연산자: or, and, inv(비트 반전), shl, shr, rotateRight, rotateLeft
+- N진수 -> 10진수: "1111".toInt(N진수) / 10진수 -> N진수: Integer.toBianry(Octal, Hex)String(1111)
