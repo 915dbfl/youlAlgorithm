@@ -15,3 +15,4 @@
 - "0".repeat(n)로 쉽게 string 생성 가능
 - 비트 연산자: or, and, inv(비트 반전), shl, shr, rotateRight, rotateLeft
 - N진수 -> 10진수: "1111".toInt(N진수) / 10진수 -> N진수: Integer.toBianry(Octal, Hex)String(1111)
+- 숫자.toChar()은 아스키코드상 문자열을 출력 / 숫자.digitToChar()을 사용하자
