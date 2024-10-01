@@ -41,39 +41,32 @@ import sys
 from itertools import combinations
 input = sys.stdin.readline
 
-def dfs(depth):
-    global cnt
-
-    # 15번째 경기에 도달했을 때
-    if depth == 15:
-        cnt = 1
-        # 모든 score가 0인지 확인
-        for sub in res:
-            if sub.count(0) != 3:
-                cnt = 0
-                break
-        return
-    
-    # game[depth] 경기
-    g1, g2 = game[depth]
-    # game[depth] 경기에서 가능한 승부 확인
-    for x, y in ((0, 2), (1, 1), (2, 0)):
-        if res[g1][x] and res[g2][y] > 0:
-            res[g1][x] -= 1
-            res[g2][y] -= 1
-            dfs(depth + 1)
-            # 백트래킹 진행
-            res[g1][x] += 1
-            res[g2][y] += 1
-
-game = list(combinations(range(6), 2))
+case = list(combinations(range(6), 2))
+state = [(2, 0), (1, 1), (0, 2)]
+caseResult = 0
 answer = []
 
+def dfs(matchTime):
+    global caseResult
+    if matchTime > 14:
+        if sum(map(sum, resultByUser)) == 0:
+            caseResult = 1
+        return
+
+    p1, p2 = case[matchTime]
+    for (s1, s2) in state:
+        if resultByUser[p1][s1] > 0 and resultByUser[p2][s2] > 0:
+            resultByUser[p1][s1] -= 1
+            resultByUser[p2][s2] -= 1
+            dfs(matchTime+1)
+            resultByUser[p1][s1] += 1
+            resultByUser[p2][s2] += 1
+
 for _ in range(4):
-    score = list(map(int, input().split()))
-    res = [score[i:i+3] for i in range(0, len(score)-1, 3)]
-    cnt = 0
+    result = list(map(int, input().split()))
+    resultByUser = [result[i:i+3] for i in range(0, len(result), 3)]
+    caseResult = 0
     dfs(0)
-    answer.append(cnt)
+    answer.append(caseResult)
 
 print(*answer)
