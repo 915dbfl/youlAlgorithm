@@ -78,3 +78,45 @@ for _ in range(s):
         print(1)
     else:
         print(0)
+
+# 다익스트라
+import sys
+from heapq import heappush, heappop
+input = sys.stdin.readline
+
+n,k = map(int,input().split())
+distance = [[401]*(n+1) for _ in range(n+1)]
+graph = [[] for _ in range(n+1)]
+
+for _ in range(k):
+    x,y = map(int,input().split())
+    graph[x].append((y,1))
+
+# ElogV * E = E**2
+def dijkstra(start):
+    hq = []
+    heappush(hq,(0,start))
+    distance[start][start] = 0
+    while hq:
+        dist,now = heappop(hq)
+
+        if distance[start][now] < dist:
+            continue
+
+        for i in graph[now]:
+            if distance[start][i[0]] > dist+i[1]:
+                distance[start][i[0]] = dist+i[1]
+                heappush(hq,(dist+i[1],i[0]))
+
+for i in range(1,n+1):
+    dijkstra(i)
+
+s = int(input())
+for _ in range(s):
+    x,y = map(int,input().split())
+    if distance[x][y]<401:
+        print(-1)
+    elif distance[y][x]<401:
+        print(1)
+    else:
+        print(0)
