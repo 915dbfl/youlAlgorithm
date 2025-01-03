@@ -85,3 +85,61 @@ def get_answer(num):
 def solution(numbers):
     answer = [get_answer(num) for num in numbers]
     return answer
+
+# 다른 풀이
+def checkTree(binary_num):
+    # 리프 노드일 경우
+    if len(binary_num) == 1:
+        return (True, binary_num == "1")
+    
+    # 루트 확인
+    route_idx = len(binary_num) // 2
+    lr, lv= checkTree(binary_num[:route_idx])
+    rr, rv = checkTree(binary_num[route_idx + 1:])
+    
+    # 루트가 없는 경우
+    if binary_num[route_idx] == '0':
+        # 하위 트리에 1이 아예 없어야 함
+        if not lv and not rv and lr and rr:
+            return (True, lv | rv)
+        else:
+            return (False, lv | rv)
+    # 루트가 있는 경우
+    else:
+        # 하위 트리가 모두 정상 트리여야 함
+        if lr and rr:
+            return (True, True)
+        else:
+            return (False, True)
+            
+def getBinary(num):
+    result = ""
+    
+    # 이진수 구하기
+    while num >= 2:
+        result += str(num % 2)
+        num //= 2
+    result += str(num)
+    
+    return result[::-1]
+import math
+
+def getMinTotalNodeCnt(num):
+    pow_num = int(math.log(len(num), 2))
+    return 2 ** (pow_num + 1) - 1
+
+def solution(numbers):
+    result = []
+    for num in numbers:
+        binary_num = getBinary(num)
+        
+        # 포화 이진트리 만들기
+        min_total_node = getMinTotalNodeCnt(binary_num)
+        left_node = min_total_node - len(binary_num)
+        binary_num = '0' * left_node + binary_num
+            
+        # 결과 추가하기
+        tr, _ = checkTree(binary_num)
+        result.append(1 if tr else 0)
+        
+    return result   
