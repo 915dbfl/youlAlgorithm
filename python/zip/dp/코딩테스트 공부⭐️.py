@@ -1,92 +1,64 @@
 # dp 활용 정답
+# 재풀이(40분)
+import sys
+
 def solution(alp, cop, problems):
-    max_alp_req, max_cop_req = [0, 0] # 목표값
-    
-    # 모든 문제를 풀기 위해 필요한 최소 목표값 구하기
+    # 구해야 하는 max 값들 계산
+    maxAlp, maxCop = 0, 0
     for problem in problems:
-        max_alp_req = max(max_alp_req, problem[0])
-        max_cop_req = max(max_cop_req, problem[1])
+        maxAlp = max(maxAlp, problem[0])
+        maxCop = max(maxCop, problem[1])
         
-    dp = [[float('inf')] * (max_cop_req+1) for _ in range(max_alp_req+1)]
+    alp = min(alp, maxAlp)
+    cop = min(cop, maxCop)
     
-    alp = min(alp, max_alp_req)
-    cop = min(cop, max_cop_req)
+    # dp 초기화    
+    dp = [[sys.maxsize] * (maxCop+2) for _ in range(maxAlp+2)]
     
-    dp[alp][cop] = 0
-    
-    for i in range(alp, max_alp_req+1):
-        for j in range(cop, max_cop_req+1):
-            # 알고력, 코딩력 1시간 학습하는 방식 적용
-            if i < max_alp_req:
-                dp[i+1][j] = min(dp[i+1][j], dp[i][j]+1)
-            if j < max_cop_req:
-                dp[i][j+1] = min(dp[i][j+1], dp[i][j]+1)
-                
-            # 문제 푸는 방식 적용
-            for alp_req, cop_req, alp_rwd, cop_rwd, cost in problems:
-                # 풀 수 있는 문제인지 확인
+    # 현재 상태로도 얻을 수 있는 알고력 / 코딩력 체크
+    for i in range(alp+1):
+        for j in range(cop+1):
+            dp[i][j] = 0
+            
+    # 점화식 진행
+    for i in range(alp, maxAlp+1):
+        for j in range(cop, maxCop+1):
+            # 공부할 경우
+            dp[i+1][j] = min(dp[i+1][j], dp[i][j]+1)
+            dp[i][j+1] = min(dp[i][j+1], dp[i][j]+1)
+            # 풀 수 있는 문제 풀기
+            for problem in problems:
+                alp_req, cop_req, alp_rwd, cop_rwd, cost = problem
+                # 풀 수 있는 문제라면
                 if i >= alp_req and j >= cop_req:
-                    # 목표값을 넘는 경우도 목표값에 도달하는 방식 중 하나
-                    new_alp = min(i+alp_rwd, max_alp_req)
-                    new_cop = min(j+cop_rwd, max_cop_req)
-                    dp[new_alp][new_cop] = min(dp[new_alp][new_cop], dp[i][j] + cost)
+                    nalp = min(i+alp_rwd, maxAlp)
+                    ncop = min(j+cop_rwd, maxCop)
+                    dp[nalp][ncop] = min(dp[nalp][ncop], dp[i][j] + cost)
                     
-    return dp[max_alp_req][max_cop_req]
+    return dp[maxAlp][maxCop]
 
-# 내 풀이(시간 초과 + 오답)
-from collections import deque
+# heapq를 사용한 풀이
+from heapq import heappush, heappop
 
-def solveP(target_alp, target_cop, alp, cop, solved):
-    dq = deque([[alp, cop, 0]]) # 현재 alp, 현재 cop, 필요한 시간
-    answer = [target_alp, target_cop, (abs(target_alp - alp) + abs(target_cop - cop))]
-    
-    while dq:
-        ca, cc, t = dq.popleft()
-        # print(ca, cc, t)
-        
-        if target_alp + target_cop <= ca + cc:
-            if t < answer[2]:
-                answer = [ca, cc, t]
-            elif t == answer[2] and (answer[0] + answer[1]) < ca + cc:
-                answer = [ca, cc, t]
-            continue
-            
-        for pa, pc, pt in solved:
-            dq.append([ca+pa, cc+pc, t+pt])
-            
-            re_alp = target_alp - (ca + pa)
-            re_cop = target_cop - (cc + pc)
-            if re_alp > 0 and re_cop > 0:
-                dq.append([target_alp, target_cop, t+pt+re_alp+re_cop])
-            
-    return answer
-            
 def solution(alp, cop, problems):
-    pl = len(problems)
-    solved = set()
-    time = 0
-    
-    while len(solved) < pl:
-        # 풀 수 있는 문제 확인
-        while 1:
-            if alp < problems[0][0] or cop < problems[0][1]:
-                # 알고력과 코딩력을 높임
-                # 풀 문제가 없는 경우
-                if len(solved) == 0:
-                    time += problems[0][0] - alp
-                    time += problems[0][1] - cop
-                    alp, cop = problems[0][0], problems[0][1]
-                # 풀 문제가 있는 경우
-                else:
-                    min_time, nalp, ncop = solveP(problems[0][0], problems[0][1], alp, cop, solved)
-                    time += min_time
-                    alp, cop = nalp, ncop
-                break
-            else:
-                rm = problems.pop(0)
-                solved.add((rm[2], rm[3], rm[4]))
+    max_alp = max(x[0] for x in problems)
+    max_cop = max(x[1] for x in problems)
+    table = [[int(1e9) for _ in range(151)] for _ in range(151)]
+    problems += [[0, 0, 1, 0, 1], [0, 0, 0, 1, 1]]
+
+    h = [(0, alp, cop)]
+    table[alp][cop] = 0
+
+    while h:
+        cur_cost, cur_alp, cur_cop = heappop(h)
+        if cur_alp >= max_alp and cur_cop >= max_cop:
+            return cur_cost
         
-        # 현재 알고력과 코딩력으로 해결 가능한 문제 순으로 정렬
-        problems.sort(key = lambda x: (abs(alp - x[0]) + abs(cop - x[1])))
-        
-    return time
+        if table[cur_alp][cur_cop] <= cur_cost:
+            for alp_req, cop_req, alp_rwd, cop_rwd, cost in problems:
+                n_alp = min(150, cur_alp + alp_rwd)
+                n_cop = min(150, cur_cop + cop_rwd)
+                # 풀 수 있는 문제라면
+                if cur_alp >= alp_req and cur_cop >= cop_req and cur_cost + cost <= table[n_alp][n_cop]:
+                    table[n_alp][n_cop] = cur_cost + cost
+                    heappush(h, (cur_cost + cost, n_alp, n_cop))
