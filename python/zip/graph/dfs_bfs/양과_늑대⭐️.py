@@ -1,31 +1,83 @@
 # dfs + backtracking
-# 오늘의 교훈: dfs + backtracking이면 재귀를 생각해보자.
+# 양방향 경로더라도 불필요하다면 단방향 도로로 생각하기
+# 재풀이 / 35분
 
 def solution(info, edges):
     answer = 0
-    visited = [0] * len(info)
-    visited[0] = 1
+    # 방분 여부 확인
+    visited = [False] * len(info)
     
-    def dfs(cur, sheep, wolf):
+    def dfs(nsheep, nwolf):
         nonlocal answer
-        if sheep > wolf:
-            answer = max(sheep, answer)
-        else:
-            return
+        answer = max(answer, nsheep)
         
-        # 연결 가능한 모든 간선을 확인하기 위해
-        # 매단계 모든 간선 확인
-        for a, b in edges:
-            # 현재와 연결할 수 있는 모든 간선 확인
-            # 부모가 이미 방문 완료되었고, 자식이 아직 방문되지 않았을 경우
-            if visited[a] == 1 and visited[b] != 1:
-                visited[b] = 1
-                # 양, 늑대 개수 적절히 업데이트
-                if info[b] == 0:
-                    dfs(b, sheep+1, wolf)
-                else:
-                    dfs(b, sheep, wolf+1)
-                visited[b] = 0
-                    
-    dfs(0, 1, 0)
+        for s, e in edges:
+            # 다음으로 방문이 가능한지 확인
+            if visited[s] and not visited[e]:
+                new_nsheep = nsheep if info[e] else nsheep + 1
+                new_nwolf = nwolf + 1 if info[e] else nwolf
+                
+                # 양이 잡아 먹히지 않는 경우인가?
+                if new_nsheep > new_nwolf:    
+                    visited[e] = True
+                    dfs(new_nsheep, new_nwolf)
+                    visited[e] = False
+
+    # dfs 진행
+    visited[0] = True
+    dfs(1, 0)
+    
     return answer
+    
+
+# 방문 가능한 노드 저장 풀이
+def solution(info, edges):
+    answer = 0
+    # 갈 수 있는 다음 노드를 나타냄
+    nxt_nodes = set()
+    # 방분 여부 확인
+    visited = [False] * len(info)
+    
+    def dfs(cur_node, nsheep, nwolf, nxt_nodes):
+        nonlocal answer
+        answer = max(answer, nsheep)
+        
+        for nxt in nxt_nodes:
+            new_nsheep = nsheep if info[nxt] else nsheep + 1
+            new_nwolf = nwolf + 1 if info[nxt] else nwolf
+            
+            if new_nsheep > new_nwolf:
+                visited[nxt] = True
+                nxt_next_nodes = set(nxt_nodes) - set([nxt])
+                for s, e in edges:
+                    if visited[s] and not visited[e]:
+                        nxt_next_nodes.add(e)
+                        
+                dfs(s, new_nsheep, new_nwolf, nxt_next_nodes)
+                visited[nxt] = False
+
+        for s, e in edges:
+            # 한 번도 방문하지 않은 다음 방문 노드 정하기
+            nxt = -1
+            if visited[e] and not visited[s] and s in nxt_nodes:
+                nxt = s
+            elif visited[s] and not visited[e] and e in nxt_nodes:
+                nxt = e
+
+            # 다음 노드 방문
+            if nxt != -1:
+                new_nsheep = nsheep if info[nxt] else nsheep + 1
+                new_nwolf = nwolf + 1 if info[nxt] else nwolf
+
+    # 루트에 따른 다음 방문 가능한 노드들 추가
+    visited[0] = True
+    for s, e in edges:
+        if s == 0:
+            nxt_nodes.add(e)
+        elif e == 0:
+            nxt_nodes.add(e)
+            
+    # dfs 진행
+    dfs(0, 1, 0, nxt_nodes)
+    return answer
+    
