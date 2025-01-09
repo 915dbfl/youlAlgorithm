@@ -1,59 +1,60 @@
 # 다익스트라 사용
+# 23분
+
+import sys
 from heapq import heappush, heappop
 from collections import defaultdict
-import sys
-INF = sys.maxsize
-
-def dijkstra(n, start, dic):
-    visited = [INF] * (n+1)
-    visited[start] = 0
-    
-    hq = []
-    heappush(hq, (0, start))
-    
-    while hq:
-        cost, cur = heappop(hq)
-        
-        if cost > visited[cur]:
-            continue
-            
-        for c, nxt in dic[cur]:
-            if visited[nxt] > cost + c:
-                visited[nxt] = cost + c
-                hq.append((cost + c, nxt))
-                
-    return visited
 
 def solution(n, s, a, b, fares):
-    dic = defaultdict(list)
+    edges = defaultdict(list)
     
-    for c, d, f in fares:
-        dic[c].append((f, d))
-        dic[d].append((f, c))
+    for start, end, cost in fares:
+        edges[start].append((cost, end))
+        edges[end].append((cost, start))
+    
+    def dijkstra(start):
+        hq = []
+        heappush(hq, (0, start))
+        dist = [sys.maxsize] * (n+1)
+        dist[start] = 0
         
-    start = dijkstra(n, s, dic)
-    a = dijkstra(n, a, dic)
-    b = dijkstra(n, b, dic)
+        while hq:
+            cur_cost, cur_node = heappop(hq)
+            
+            if dist[cur_node] < cur_cost:
+                continue
+                
+            for nxt_cost, nxt_node in edges[cur_node]:
+                if nxt_cost + cur_cost < dist[nxt_node]:
+                    updated_cost = nxt_cost + cur_cost
+                    dist[nxt_node] = updated_cost
+                    heappush(hq, (updated_cost, nxt_node))
+                    
+        return dist
     
-    answer = INF
+    dist_start = dijkstra(s)
+    dist_a = dijkstra(a)
+    dist_b = dijkstra(b)
+    
+    min_cost = dist_start[a] + dist_start[b]
     for i in range(1, n+1):
-        answer = min(answer, start[i] + a[i] + b[i])
-        
-    return answer
+        if dist_start[i] + dist_a[i] + dist_b[i] < min_cost:
+            min_cost = dist_start[i] + dist_a[i] + dist_b[i]
+            
+    return min_cost
     
 # 플로이드 워샬 활용
 import sys
-INF = sys.maxsize
 
 def solution(n, s, a, b, fares):
-    dist = [[INF] * (n+1) for _ in range(n+1)]
+    dist = [[sys.maxsize] * (n+1) for _ in range(n+1)]
     
-    for i in range(1, n+1):
+    for i in range(n+1):
         dist[i][i] = 0
-        
-    for x, y, c in fares:
-        dist[x][y] = c
-        dist[y][x] = c
+    
+    for start, end, cost in fares:
+        dist[start][end] = cost
+        dist[end][start] = cost
         
     for k in range(1, n+1):
         for i in range(1, n+1):
@@ -61,7 +62,8 @@ def solution(n, s, a, b, fares):
                 if dist[i][j] > dist[i][k] + dist[k][j]:
                     dist[i][j] = dist[i][k] + dist[k][j]
                     
-    answer = INF
+    answer = sys.maxsize
     for i in range(1, n+1):
-        answer = min(answer, dist[s][i]+dist[i][a]+dist[i][b])
+        answer = min(answer, dist[s][i] + dist[i][a] + dist[i][b])
+            
     return answer
