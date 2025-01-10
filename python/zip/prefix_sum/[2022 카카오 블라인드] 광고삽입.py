@@ -1,59 +1,62 @@
 # 누적합으로 계산
-# 헷갈렸던 부분: 시청 종료 시간은 시청한 시간으로 포함하지 않는다!
-
-# 초시간 가져오기
-def get_time(time):
-    h, m, s = map(int, time.split(":"))
-    return h * 3600 + m * 60 + s
-
-# 초시간 str 가져오기
-def get_str_time(time):
-    h = time // 3600
-    m = (time % 3600) // 60
-    s = (time % 3600) % 60
-    
-    h =  "0" + str(h) if h < 10 else str(h)
-    m = "0" + str(m) if m < 10 else str(m)
-    s = "0" + str(s) if s < 10 else str(s)
-
-    return h + ":" + m + ":" + s
+# 헷갈렸던 부분: 시청 종료 시간은 시청한 시간으로 포함하지 않는다!⭐️
 
 def solution(play_time, adv_time, logs):
-    logs.sort()
-    max_size = (3600 * 99) + (60 * 59) + 61
-    prefix = [0] * (max_size)
-    
-    for log in logs:
-        start, end = log.split("-")
-        prefix[get_time(start)] += 1
-        prefix[get_time(end)] -= 1
-    
-    # 구간 합 구하기
-    for i in range(1, len(prefix)):
-        prefix[i] += prefix[i-1]
+    def ss_to_time(ss):
+        time = []
+        h = ss // 3600
+        time.append(h)
+        m = (ss % 3600) // 60
+        time.append(m)
+        time.append((ss % 60))
         
-    # 최대 누적 재생시간 구하기
-    adv_time = get_time(adv_time)
-    # 0부터 시작했을 때로 값 초기화
-    sum_of_play = sum(prefix[:adv_time])
-    sum_start = 0
-    max_sum = sum_of_play
-    max_sum_start = 0
+        return ":".join(map(lambda x: str(x).zfill(2), time))
     
-    for i in range(adv_time, len(prefix)):
-        sum_of_play += prefix[i]
-        sum_of_play -= prefix[sum_start]
-        sum_start += 1
+    def time_to_ss(h, m, s):
+        return h * 3600 + m * 60 + s
+    
+    def cal_prefix(pf, logs):
+        for log in logs:
+            start, end = log.split("-")
+            sh, sm, ss = map(int, start.split(":"))
+            eh, em, es = map(int, end.split(":"))
+            
+            start_ss = time_to_ss(sh, sm, ss)
+            end_ss = time_to_ss(eh, em, es)
+            
+            # 시청 시간 이상 / 미만
+            pf[start_ss] += 1
+            pf[end_ss] -= 1 
+            
+        for i in range(1, len(pf)):
+            pf[i] += pf[i-1]
         
-        if sum_of_play > max_sum:
-            max_sum = sum_of_play
-            max_sum_start = sum_start
-                
-    play_time = get_time(play_time)
-    if play_time - max_sum_start < adv_time:
-        return get_str_time(play_time - adv_time)
-    else:
-        return get_str_time(max_sum_start)
+    ph, pm, ps = map(int, play_time.split(":"))
+    total_ss = time_to_ss(ph, pm, ps)
+    
+    # 누적합 배열
+    pf = [0] * (total_ss + 1)
+    # log에 따른 누적합 계산
+    cal_prefix(pf, logs)
+    
+    # 동영상 재생 시간 dp
+    adh, adm, ads = map(int, adv_time.split(":"))
+    adv_ss = time_to_ss(adh, adm, ads)
+
+    max_play_time = sum(pf[:adv_ss])
+    insert_time = 0
+    cur_play_time = max_play_time
+    
+    # 최대 재생 시간 구하기
+    for i in range(adv_ss, len(pf)):
+        cur_play_time += pf[i] - pf[i - adv_ss]
+        
+        if cur_play_time > max_play_time:
+            max_play_time = cur_play_time
+            insert_time = i - adv_ss + 1
+
+    # ss to time
+    return ss_to_time(insert_time)
     
 # refactoring
 def s2i(s):
