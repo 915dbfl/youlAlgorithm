@@ -1,6 +1,6 @@
 """
 [풀이 과정] - 오답
-1. 취약 지점을 다 돌 수 있는 가장 짧은 루트 구하기
+1. 취약 지점을 다 돌 수 있는 가장 짧은 루트 구하기 -> ⭐️ 무조건 해당 루트가 정답은 아님!!
 2. 최소 인원 구하기
     - dist 순으로 작업? -> 최선의 답이 아님
     - dist 순열 구하기 -> 모든 경우 확인
@@ -86,3 +86,36 @@ def solution(n, weak, dist):
         if case_worker != -1 and min_worker > case_worker:
             min_worker = case_worker
     return -1 if min_worker == sys.maxsize else min_worker
+
+"""
+[재풀이]
+1. 시작 취약 지점 구하기
+2. 작업자 순열 구하기
+3. 취약 지점 전체 돌기 -> 최소 투입 인원 구하기
+"""
+
+from itertools import permutations
+import sys
+
+def solution(n, weak, dist):
+    weak_len = len(weak)
+    dist.sort(reverse = True)
+    extended_weak = weak + [n + w for w in weak]
+    min_workers = sys.maxsize
+    
+    for start in range(weak_len):
+        for case in permutations(dist):
+            workers = 0
+            position = extended_weak[start]
+            # 취약 지점 전체 돌기
+            for i in range(weak_len):
+                next_weak = extended_weak[start + i]
+                diff = next_weak - position
+                if diff > case[workers]:
+                    workers += 1
+                    if workers >= len(dist):
+                        break
+                    position = next_weak
+            else:
+                 min_workers = min(min_workers, workers+1) 
+    return min_workers if min_workers != sys.maxsize else -1
