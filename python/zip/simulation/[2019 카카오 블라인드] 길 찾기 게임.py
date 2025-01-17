@@ -1,88 +1,95 @@
+"""
+2시간 / 최적화 필요
+
+[이진 트리를 어떻게 파악할 것인가?]
+1. 자식 노드의 y값은 항상 부모 노드보다 작다
+    - y순으로 정렬
+    - y값이 가장 큰 값이 루트 노드 이다.
+2. 부모 노드의 왼쪽/오른쪽 서브트리 속 노드들의 x값은 부모 노드의 x값보다 작다/크다.
+    - x순으로 정렬
+    - 루트 노드 탐색
+    - 루트 노드를 기준으로 재귀 호출
+"""
 import sys
-sys.setrecursionlimit(10**4)
+sys.setrecursionlimit(10**6)
 
-class BinaryTree:
-    def __init__(self, nodes):
-        # 지금까지 완성된 트리
-        clear = Node(nodes[0][2], nodes[0][0], nodes[0][1])
-        self.root = clear
-        new = None
+prev = []
+post = []
+
+# 루트 노드의 위치를 알아내는 함수
+def binary_search(s, e, target_x, list):
+    start = s
+    end = e
     
-        for idx in range(1, len(nodes)):
-            new = Node(nodes[idx][2], nodes[idx][0], nodes[idx][1])
-            # new가 clear의 right인지 판단
-            if clear.y >= new.y:
-                # new의 y값보다 작은 값이 나올 때까지 child 탐색
-                cur = clear
-                while cur.right != None and cur.right.y > new.y:
-                    cur = cur.right
-                # new 추가
-                new.left = cur.right
-                cur.right = new
-                
-            # clear가 new의 left인지 판단
-            else:
-                new.left = clear
-                clear = new
-                
-            # root 업데이트
-            if self.root.y < new.y:
-                self.root = new
-            
-class Node:
-    def __init__(self, num, x, y):
-        self.num = num
-        self.x = x
-        self.y = y
-        self.left = None
-        self.right = None
+    while start <= end:
+        mid = (start + end) // 2
         
-# 전위 순회 함수        
-def getPre(cur):
-    order = []
-    if cur.left == None and cur.right == Node:
-        return [cur.num]
-    else:
-        order.append(cur.num)
-        if cur.left != None:
-            leftChild = getPre(cur.left)
-            for c in leftChild:
-                order.append(c)
-        if cur.right != None:
-            rightChild = getPre(cur.right)
-            for c in rightChild:
-                order.append(c)
-                
-    return order
+        # x값으로 정렬 되어 있음
+        # 따라서 x값에 따라 이분 탐색 진행
+        if list[mid][1][0] == target_x:
+            return mid
+        elif list[mid][1][0] > target_x:
+            end = mid-1
+        elif list[mid][1][0] < target_x:
+            start = mid +1
+    return -1
+            
+# 루트 노드를 알아내는 함수
+def find_root(node_rev_idx, start, end, node_rev_sorted_by_y, node_sorted_by_x):
+    prev_root = node_rev_sorted_by_y[node_rev_idx]
+    cur_root = node_rev_sorted_by_y[node_rev_idx+1]
+    cur_root_idx = binary_search(start, end, cur_root[1][0], node_sorted_by_x)
     
-# 후위 순회 함수    
-def getPost(cur):
-    order = []
-    if cur.left != None:
-        leftChild = getPost(cur.left)
-        for c in leftChild:
-            order.append(c)
-    if cur.right != None:
-        rightChild = getPost(cur.right)
-        for c in rightChild:
-            order.append(c)
-    order.append(cur.num)
+    # y값으로 정렬된 배열에서 빠르게 루트 구하기
+    while True:
+        if cur_root[1][1] < prev_root[1][1] and start <= cur_root_idx <= end:
+            break
+        node_rev_idx += 1
+        cur_root = node_rev_sorted_by_y[node_rev_idx]
+        cur_root_idx = binary_search(start, end, cur_root[1][0], node_sorted_by_x)
+        
+    
+    return cur_root, node_rev_idx, cur_root_idx
 
-    return order
-         
-def solution(nodeinfo):
-    # num과 node 함께 관리
-    nodeinfo = [[nodeinfo[idx][0], nodeinfo[idx][1], idx+1] for idx in range(len(nodeinfo))]
-    # 노드 위치 파악을 위한 정렬
-    nodeinfo.sort(key = lambda x: (x[0]))
-    # 이진 트리 생성
-    tree = BinaryTree(nodeinfo)
-    # 전위 순회
-    answer = []
-    answer.append(getPre(tree.root))
-    answer.append(getPost(tree.root))
+# 이진 트리 만들기
+def make_tree(node_rev_idx, start, end, node_rev_sorted_by_y, node_sorted_by_x):
     
-    return answer
+    # 범위를 넘어가거나 start > end일 경우 가지치기
+    if start > end or start < 0 or end >= len(node_rev_sorted_by_y):
+        return
+    
+    # 노드가 하나만 남을 때
+    if start == end:
+        prev.append(node_sorted_by_x[start][0])
+        post.append(node_sorted_by_x[start][0])
+        return
+    
+    # root 찾기
+    root, nx_rev_idx, root_idx= find_root(node_rev_idx, start, end, node_rev_sorted_by_y, node_sorted_by_x)
+    
+    # 전위 추가
+    prev.append(root[0])
+    # 왼쪽 서브트리 탐색
+    make_tree(nx_rev_idx, start, root_idx - 1, node_rev_sorted_by_y, node_sorted_by_x)
+    # 오른쪽 서브트리 탐색
+    make_tree(nx_rev_idx, root_idx + 1, end, node_rev_sorted_by_y, node_sorted_by_x)
+    # 후위 추가
+    post.append(root[0])
+    
+def solution(nodeinfo):
+    node_with_index = list(map(lambda i: [i+1, nodeinfo[i]], range(len(nodeinfo))))
+    node_rev_sorted_by_y = sorted(node_with_index, key = lambda x: (x[1][1], -x[1][0]), reverse = True)
+    node_sorted_by_x= sorted(node_with_index, key = lambda x: x[1][0])
+    
+    root = node_rev_sorted_by_y[0]
+    root_idx = binary_search(0, len(nodeinfo), root[1][0], node_sorted_by_x)
+    prev.append(root[0])
+    
+    make_tree(0, 0, root_idx -1 , node_rev_sorted_by_y, node_sorted_by_x)
+    make_tree(0, root_idx + 1, len(nodeinfo)-1, node_rev_sorted_by_y, node_sorted_by_x)
+    post.append(root[0])
+    return [prev, post]
+    
     
 # 트리를 만드는 과정에서 pre, post 구하기⭐️
 # 핵심: root를 중심으로 left, right 나누며 재귀 진행
@@ -115,3 +122,4 @@ def solution(nodeinfo):
     make_tree(nodes)
     
     return [preOrder, postOrder]
+
