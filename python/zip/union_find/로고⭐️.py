@@ -149,3 +149,66 @@ for i in range(2001):
             bfs(i, j)
 
 print(group_cnt)
+
+# union find 풀이
+
+import sys
+input = sys.stdin.readline
+
+def find(a):
+    if parent[a] != a:
+        parent[a] = find(parent[a])
+    return parent[a]
+
+def union(a, b):
+    pa = find(a)
+    pb = find(b)
+
+    if pa < pb:
+        parent[pb] = parent[pa]
+    else:
+        parent[pa] = parent[pb]
+
+def isCrossed(a, b):
+    x1, y1, x2, y2 = points[a]
+    x3, y3, x4, y4 = points[b]
+
+    if x3 > x2 or x4 < x1 or y3 > y2 or y4 < y1:
+        return False
+    
+    if x1 < x3 and x4 < x2 and y1 < y3 and y4 < y2:
+        return False
+    
+    if x3 < x1 and x2 < x4 and y3 < y1 and y2 < y4:
+        return False
+    
+    return True
+
+n = int(input())
+points = []
+original = False
+parent = [i for i in range(n)]
+answer = 0
+
+for i in range(n):
+    x1, y1, x2, y2 = map(int, input().split())
+    points.append([x1, y1, x2, y2])
+
+    if x1 == 0 or x2 == 0:
+        if y1 <= 0 <= y2:
+            answer = -1
+    
+    if y1 == 0 or y2 == 0:
+        if x1 <= 0 <= x2:
+            answer = -1
+
+for i in range(n-1):
+    for j in range(i+1, n):
+        if isCrossed(i, j):
+            union(i, j)
+
+for i in range(n):
+    if parent[i] == i:
+        answer += 1
+
+print(answer)

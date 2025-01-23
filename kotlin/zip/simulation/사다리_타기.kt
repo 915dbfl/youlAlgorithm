@@ -157,3 +157,75 @@ private fun swap(i: Int, j: Int, arr: CharArray) {
     arr[i] = arr[j]
     arr[j] = temp
 }
+
+// 재풀이
+// 1시간 반
+
+fun main() = with(System.`in`.bufferedReader()) {
+    val k = readLine().toInt()
+    val n = readLine().toInt()
+
+    val order = readLine().toCharArray()
+    val lines = arrayListOf<CharArray>()
+    var unknown = -1
+
+    fun downPlay(start: CharArray, s: Int, e: Int): CharArray {
+        val result = CharArray(k){' '}
+        // 알파벳 이동
+        for (i in 0 until k) {
+            var cur = i
+            for (j in s until e) {
+                if (cur < k-1 && lines[j][cur] == '-') {
+                    cur += 1
+                } else if (cur > 0 && lines[j][cur-1] == '-' ) {
+                    cur -= 1
+                }
+            }
+            result[cur] = start[i]
+        }
+        return result
+    }
+
+    fun upPlay(start: CharArray, s: Int, e: Int): CharArray {
+        val result = CharArray(k){' '}
+        // 알파벳 이동
+        for (i in 0 until k) {
+            var cur = i
+            for (j in s downTo e) {
+                if (cur < k-1 && lines[j][cur] == '-') {
+                    cur += 1
+                } else if (cur > 0 && lines[j][cur-1] == '-' ) {
+                    cur -= 1
+                }
+            }
+            result[cur] = start[i]
+        }
+        return result
+    }
+
+    for (i in 0 until n) {
+        val line = readLine().toCharArray()
+        if (line[0] == '?') {
+            unknown = i
+        }
+
+        lines.add(line)
+    }
+
+    val start = CharArray(k) {'A' + it}
+    val topResult = downPlay(start, 0, unknown)
+    val bottomResult = upPlay(order, n-1, unknown+1)
+
+    val answer = StringBuilder()
+    for (i in 0 until k-1) {
+        if (topResult[i] == bottomResult[i] || (i > 0 && topResult[i] == bottomResult[i-1])) {
+            answer.append("*")
+        } else if (topResult[i] == bottomResult[i+1]) {
+            answer.append("-")
+        } else {
+            print("x".repeat(k-1))
+            return
+        }
+    }
+    print(answer.toString())
+}
