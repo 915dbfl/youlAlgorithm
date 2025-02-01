@@ -1,4 +1,68 @@
 /*
+풀이 과정
+1. 누적합 구하기
+2. 전체 누적합 / 4 != 0
+    - 동일한 누적합으로 4등분 불가능
+3. dp 재귀 호출
+ */
+
+private lateinit var prefix: LongArray
+private lateinit var dp: Array<LongArray>
+
+private fun calCase(
+    index: Int,
+    cnt: Int, 
+    k: Long,
+    n: Int
+): Long {
+    // 4등분이 완료되었을 경우
+    if (cnt == 3) {
+        return if (index < n) 1 else 0
+    }
+
+    // 유효한 인덱스가 아닐 때
+    if (index >= n) {
+        return 0
+    }
+
+    // dp 계산하기
+    if (dp[index][cnt] != -1L) {
+        return dp[index][cnt]
+    }
+
+    // dp 계산하기
+    dp[index][cnt] = 0
+    if (prefix[index] == (cnt + 1) * k) {
+        dp[index][cnt] += calCase(index+1, cnt+1, k, n)
+    }
+    dp[index][cnt] += calCase(index+1, cnt, k, n)
+
+    return dp[index][cnt]
+}
+
+fun main() = with(System.`in`.bufferedReader()) {
+    val n = readLine().toInt()
+    val nums = readLine().split(" ").map {it.toInt()}.toIntArray()
+
+    prefix = LongArray(n)
+    prefix[0] = nums[0].toLong()
+    dp = Array(n) {LongArray(4) {-1L}}
+
+    // 누적합 계산
+    for (i in 1 until n) {
+        prefix[i] += prefix[i-1] + nums[i]
+    }
+
+    // 4등분 할 수 있는지 확인
+    if (prefix[n-1] % 4 != 0L) {
+        println(0)
+    } else {
+        val k = prefix[n-1] / 4
+        println(calCase(0, 0, k, n))
+    }
+}
+
+/*
 풀이과정 - 누적합 (60점)
 1. 누적합으로 합 저장
 2. 세 개의 index 구하기
@@ -14,7 +78,7 @@
     val nums = readLine().split(" ").map { it.toInt()}.toIntArray()
     
     val prefix = LongArray(n) {0L}
-    prefix[0] = nums[0].toLong()
+    prefix[0] = nums[0]
 
     for (i in 1 until n) {
         prefix[i] += prefix[i-1] + nums[i]
