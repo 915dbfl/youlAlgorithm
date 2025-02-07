@@ -2,58 +2,52 @@ import sys
 from collections import deque
 input = sys.stdin.readline
 
-n = int(input())
-arr = [list(input().rstrip()) for _ in range(n)]
-
+# 상하좌우
 dx = [-1, 1, 0, 0]
-dy = [0, 0, 1, -1]
+dy = [0, 0, -1, 1]
 
-# 시작하는 문의 x, y
-ox, oy = -1, -1
-# 끝나는 문의 x, y
-cx, cy = -1, 1
+n = int(input())
+room = []
+for _ in range(n):
+    room.append(list(input()))
 
+# 문 위치 구하기
+door = []
 for i in range(n):
     for j in range(n):
-        if arr[i][j] == "#":
-            if ox == -1 and oy == -1:
-                ox, oy = i, j
-            else:
-                cx, cy = i, j
+        if room[i][j] == '#':
+            door.append((i, j))
 
-check = [[[-1] * 4 for _ in range(n)] for _ in range(n)]
-q = deque()
-
-# 시작 지점에서 시작 방향 설정
+visited = [[[-1] * 4 for _ in range(n)] for _ in range(n)]
+dq = deque()
+sx, sy = door[0]
+# 상화좌우 모두 초기값으로 설정
 for i in range(4):
-    q.append((ox, oy, i))
-    check[ox][oy][i] = 0
+    visited[sx][sy][i] += 1
+    dq.append((i, sx, sy))
 
-while q:
-    x, y, dir = q.popleft()
-    # 현재 지점이 닫는 문이면 정답 출력 후 바로 종료
-    if x == cx and y == cy:
-        print(check[x][y][dir])
+while dq:
+    dir, curx, cury = dq.popleft()
+
+    # bfs로 최소 거울 수 찾기 완료!
+    if door[1] == (curx, cury):
+        print(visited[curx][cury][dir])
         break
 
-    nx, ny = x + dx[dir], y + dy[dir]
-    # 범위에 만족하는 경우
-    if 0 <= nx < n and 0 <= ny < n:
-        # 벽이 아닌 경우
-        if arr[nx][ny] != "*":
-            # 처음 방문한 곳 / 더 적은 횟수로 갈 수 있는 곳
-            # 큐의 가장 앞에 삽입
-            if check[nx][ny][dir] == -1 or check[nx][ny][dir] > check[x][y][dir]:
-                check[nx][ny][dir] = check[x][y][dir]
-                q.appendleft((nx, ny, dir))
+    nx = curx + dx[dir]
+    ny = cury + dy[dir]
+    if 0<=nx<n and 0<=ny<n and room[nx][ny] != '*':
+        if visited[nx][ny][dir] == -1 or visited[nx][ny][dir] > visited[curx][cury][dir]:
+            visited[nx][ny][dir] = visited[curx][cury][dir]
+            dq.appendleft((dir, nx, ny))
+        
+    if room[curx][cury] == '!':
+        ndirs = (2, 3) if dir in (0, 1) else (0, 1)
+        for ndir in ndirs:
+            nx = curx + dx[ndir]
+            ny = cury + dy[ndir]
 
-            # 거울을 놓는 경우
-            # 거울 설치 -> 큐의 뒷부분에 삽입
-            if arr[nx][ny] == "!":
-                # 북, 남 -> 동, 서로 반사
-                # 동, 서 -> 북, 남으로 반사
-                nds = [2, 3] if dir < 2 else [0, 1]
-                for nd in nds:
-                    if check[nx][ny][nd] == -1 or check[nx][ny][nd] > check[x][y][dir] + 1:
-                        check[nx][ny][nd] = check[x][y][dir] + 1
-                        q.append((nx, ny, nd))
+            if 0<=nx<n and 0<=ny<n and room[nx][ny] != '*':
+                if visited[nx][ny][ndir] == -1 or visited[nx][ny][ndir] > visited[curx][cury][dir] + 1:
+                    visited[nx][ny][ndir] = visited[curx][cury][dir] + 1
+                    dq.append((ndir, nx, ny))
