@@ -1,65 +1,72 @@
-import java.util.*
+/*
+- 합 정렬 + 투 포인터
+- 두 포인터가 가르키는 위치의 합이 0이 될 경우
+    - ab 배열 포인터 이동, cd 배열 포인터 이동
+- ab 배열 + cd 배열 > 0
+    - ab 포인터 이동
+- ab 배열 + cd 배열 < 0
+    - cd 포인터 이동
+ */
+
+import java.util.StringTokenizer
 
 fun main() = with(System.`in`.bufferedReader()) {
-    var st = StringTokenizer(readLine())
-    val n = st.nextToken().toInt()
+    val n = readLine().toInt()
+    
+    val A = IntArray(n)
+    val B = IntArray(n)
+    val C = IntArray(n)
+    val D = IntArray(n)
 
-    val a = IntArray(n)
-    val b = IntArray(n)
-    val c = IntArray(n)
-    val d = IntArray(n)
-
+    var st: StringTokenizer
     for (i in 0 until n) {
         st = StringTokenizer(readLine())
-
-        a[i] = st.nextToken().toInt()
-        b[i] = st.nextToken().toInt()
-        c[i] = st.nextToken().toInt()
-        d[i] = st.nextToken().toInt()
+        A[i] = st.nextToken().toInt()
+        B[i] = st.nextToken().toInt()
+        C[i] = st.nextToken().toInt()
+        D[i] = st.nextToken().toInt()
     }
 
-    val max = n * n
-    val ab = IntArray(max)
-    val cd = IntArray(max)
+    val ab = IntArray(n*n)
+    val cd = IntArray(n*n)
 
-    var idx = 0
-
+    var index = 0
     for (i in 0 until n) {
         for (j in 0 until n) {
-            ab[idx] = a[i] + b[j]
-            cd[idx++] = c[i] + d[j]
+            ab[index] = A[i] + B[j]
+            cd[index] = C[i] + D[j]
+            index++
         }
     }
 
     ab.sort()
     cd.sort()
 
-    var ans = 0L
-    var left = 0
-    var right = max - 1
+    var p1 = 0
+    var p2 = ab.size - 1
+    var answer = 0L
 
-    while (left < max && right >= 0) {
-        if (ab[left] + cd[right] < 0) left++
-        else if (ab[left] + cd[right] > 0) right--
+    while (p1 < ab.size && p2 >= 0) {
+        if (ab[p1] + cd[p2] > 0) p2--
+        else if (ab[p1] + cd[p2] < 0) p1++
         else {
-            var leftCount = 1L
-            var rightCount = 1L
+            var countAB = 1L
+            var countCD = 1L
 
-            while (left + 1 < max && (ab[left] == ab[left + 1])) {
-                leftCount++
-                left++
+            while (p1 < (ab.size - 1) && ab[p1] == ab[p1+1]) {
+                countAB++
+                p1++
+            }
+            while (p2 > 0 && cd[p2] == cd[p2 - 1]) {
+                countCD++
+                p2--
             }
 
-            while (right > 0 && (cd[right] == cd[right - 1])) {
-                rightCount++
-                right--
-            }
-
-            ans += leftCount * rightCount
-            left ++
-            right -- 
+            answer += countAB * countCD
+            p1++
+            p2--
         }
-
     }
-    println(ans)
+
+    println(answer)
 }
