@@ -1,69 +1,81 @@
-import kotlin.collections.ArrayDeque
+// 1시간 10분
 import kotlin.math.*
+import java.util.ArrayDeque
 
-private class Solution17135 {
-    // 좌상우
+private class Solution17135(
+    private val n: Int,
+    private val m: Int, 
+    private val d: Int,
+    private val board: Array<IntArray>,
+) {
+    private var maxRm = 0
     private val dx = listOf(0, -1, 0)
     private val dy = listOf(-1, 0, 1)
+    private lateinit var tempBoard: Array<IntArray>
 
-    private fun ArcherCombination(
-        m: Int
-    ): ArrayList<IntArray> {
-        val combis = ArrayList<IntArray>()
-        
+    fun solve(): Int {
+        // 조합 구하기
         for (i in 0 until m) {
             for (j in i+1 until m) {
                 for (k in j+1 until m) {
-                    combis.add(intArrayOf(i, j, k))
+                    tempBoard = Array(n) {board[it].copyOf()}
+                    play(n, i, j, k, 0)
                 }
             }
         }
 
-        return combis
+        return maxRm
     }
 
-    private fun isFinished(
-        ax: Int,
-        board: Array<IntArray>,
-    ): Boolean {
-        for (ri in ax-1 downTo 0) {
-            if (board[ri].sum() > 0) {
+    private fun play(start: Int, first: Int, second: Int, third:Int, totalRm: Int) {
+        if (start == 0 || removeAllEnemy(start)) {
+            maxRm = max(maxRm, totalRm)
+            return
+        }
+        
+        val enemies = mutableSetOf<Pair<Int, Int>>()
+        findEnemy(start, first)?.let{ enemies.add(it) }
+        findEnemy(start, second)?.let{ enemies.add(it) }
+        findEnemy(start, third)?.let{ enemies.add(it) }
+
+        // 적 제거
+        for((x, y) in enemies) {
+            tempBoard[x][y] = 0
+        }
+
+        play(start - 1, first, second, third, totalRm + enemies.size)
+    }
+
+    private fun removeAllEnemy(start: Int): Boolean {
+        for (i in start - 1 downTo 0) {
+            if (tempBoard[i].sum() > 0) {
                 return false
             }
         }
         return true
     }
 
-    private fun removeEnemy(
-        ax: Int,
-        ay: Int,
-        d: Int,
-        board: Array<IntArray>,
-    ): Pair<Int, Int>? {
-        val dq = ArrayDeque<List<Int>>()
-        val visited = Array(board.size) {BooleanArray(board[0].size)}
-        // 거리, 현재x, 현재y
-        dq.add(listOf(1, ax-1, ay))
-        visited[ax-1][ay] = true
+    // dfs
+    private fun findEnemy(x: Int, y: Int): Pair<Int, Int>? {
+        val dq = ArrayDeque<Pair<Int, Int>>()
+        val visited = Array(n) {BooleanArray(m)}
+        dq.add(x-1 to y)
+        visited[x-1][y] = true
 
-        if (board[ax-1][ay] == 1) {
-            return ax-1 to ay
-        }
+        while (dq.isNotEmpty()) {
+            val (curx, cury) = dq.removeFirst()
 
-        while(dq.isNotEmpty()) {
-            val (dist, cx, cy) = dq.removeFirst()
+            if (tempBoard[curx][cury] == 1) {
+                return curx to cury
+            }
 
             for (i in 0 until 3) {
-                val nx = cx + dx[i]
-                val ny = cy + dy[i]
+                val nx = curx + dx[i]
+                val ny = cury + dy[i]
 
-                if (0 <= nx && nx < board.size && 0 <= ny && ny < board[0].size && !visited[nx][ny] && dist + 1 <= d) {
-                    if (board[nx][ny] == 1) {
-                        return nx to ny
-                    }
-
+                if (0 <= nx && 0 <= ny && ny < m &&  calDist(x, y, nx, ny) <= d && !visited[nx][ny]) {
                     visited[nx][ny] = true
-                    dq.add(listOf(dist+1, nx, ny))
+                    dq.add(nx to ny)
                 }
             }
         }
@@ -71,51 +83,8 @@ private class Solution17135 {
         return null
     }
 
-    private fun remove(
-        rmSet: Set<Pair<Int, Int>>,
-        board: Array<IntArray>,
-    ) {
-        for((x, y) in rmSet) {
-            board[x][y] = 0
-        }
-    }
-
-    private fun play(
-        archers: IntArray,
-        d: Int,
-        board: Array<IntArray>,
-    ): Int {
-        // 적이 아닌 궁수가 이동
-        var answer = 0
-        var removeSet = mutableSetOf<Pair<Int, Int>>()
-        for (ax in board.size downTo 0) {
-            if (isFinished(ax, board)) break
-            for (ai in 0 until 3) {
-                val result = removeEnemy(ax, archers[ai], d, board)
-                result?.let {
-                    removeSet.add(result)
-                }
-            }
-            answer += removeSet.size
-            remove(removeSet, board)
-            removeSet.clear()
-        }
-        return answer
-    }
-
-    fun solve(
-        n: Int,
-        m: Int, 
-        d: Int,
-        board: Array<IntArray>,
-    ) {
-        val archerCombination = ArcherCombination(m)
-        var answer = 0
-        for (archers in archerCombination) {
-            val newBoard = board.map {it.copyOf()}.toTypedArray()
-            answer = max(answer, play(archers, d, newBoard))
-        }
-        println(answer)
+    private fun calDist(x: Int, y: Int, nx: Int, ny: Int): Int {
+        return abs(nx - x) + abs(ny - y)
     }
 }
 
@@ -124,5 +93,6 @@ fun main() = with(System.`in`.bufferedReader()) {
     val board = Array(n) {
         readLine().split(" ").map {it.toInt()}.toIntArray()
     }
-    Solution17135().solve(n, m, d, board)
+    val solution17135 = Solution17135(n, m, d, board)
+    println(solution17135.solve())
 }
