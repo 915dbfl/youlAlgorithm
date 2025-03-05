@@ -1,25 +1,16 @@
-# 1시간 10분
+# 30분
 
 def solution(n, tops):
+    dp = []
     if tops[0] == 1:
-        ans = 4
-        pf = 3
+        dp.extend([1, 4])
     else:
-        ans = 3
-        pf = 2
+        dp.extend([1, 3])
         
     for i in range(1, n):
-        cur = ans
-        # 덮개가 있는 경우
         if tops[i] == 1:
-            cur *= 3
-            cur += pf 
-            pf += ans * 2
-        # 덮개가 없는 경우
+            dp.append((dp[-1] * 3 + dp[-1] - dp[-2]) % 10007)
         else:
-            cur *= 2
-            cur += pf
-            pf += ans
-        ans = cur % 10007
-        
-    return ans
+            dp.append((dp[-1] * 2 + dp[-1] - dp[-2]) % 10007)
+            
+    return dp[-1]

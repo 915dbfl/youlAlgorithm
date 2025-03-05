@@ -105,3 +105,62 @@ def solution(dice):
         
     # 결과 반환
     return answer
+
+# 30분
+"""
+# 풀이 과정
+- 특정 주사위를 선택해야 하는 명확한 이유가 없음
+- 그리고 승률을 구해야 하기 때문에 모든 경우를 확인해야 함
+- 시간 복잡도 줄이기
+    - 전체 조합을 확인하지 않아도 된다.
+    - 결국 a를 제외하면 b가 선택하게 되니, a / b의 승률을 모두 구해서 활용
+"""
+
+from itertools import combinations, product
+from collections import defaultdict
+
+def solution(dice):
+    # 모든 주사위 play 조합 cnt 저장
+    def play_case(lst):
+        dices = []
+        for num in lst:
+            dices.append(dice[num-1])
+        
+        dict = defaultdict(int)
+        for case in product(*dices):
+            dict[sum(case)] += 1
+    
+        return dict
+            
+    # 해당 케이스 승률 구하기
+    def cal_win(a, b):        
+        a_dict = play_case(a)
+        b_dict = play_case(b)
+        
+        winA = winB = 0
+        for caseA, cntA in a_dict.items():
+            for caseB, cntB in b_dict.items():
+                if caseA > caseB:
+                    winA += cntA * cntB
+                elif caseB > caseA:
+                    winB += cntA * cntB
+        return winA, winB
+    
+    nums = range(1, len(dice)+1)
+    best_case = []
+    max_win = -1
+    # 주사위 선택 조합 절반만 확인
+    cases = list(combinations(nums, len(dice)//2))
+    real_case = [[cases[i], cases[-1-i]] for i in range(len(cases)//2)]
+    # a, b 승률 모두 구하기
+    for a, b in real_case:
+        winA, winB = cal_win(a, b)
+        
+        if max_win < winA:
+            max_win = winA
+            best_case = a
+        if max_win < winB:
+            max_win = winB
+            best_case = b
+    
+    return sorted(best_case)

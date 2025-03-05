@@ -72,61 +72,69 @@ def solution(numbers):
     return answer
         
 # dp 처리 -> 시간 초과
+"""
+# dfs로 하면 시간 초과 발생하는 이유
+- dfs를 진행할 경우
+    - 왼손으로 쭉 이동하는 경우 파악 -> 오른손으로 이동하는 경우 파악
+    - 최적의 dp가 설정되지 않아 가지치기가 제대로 되지 않는다.
+    -> bfs를 통해 왼손 / 오른손 번갈아 움직이면서 최적의 dp를 빠르게 설정할 수 있다.
+"""
+from collections import defaultdict, deque
 import sys
-from collections import deque
-sys.setrecursionlimit(10**6)
+
+def cal_weight(xy1, xy2):
+    x1, y1 = xy1
+    x2, y2 = xy2
+    diff1 = abs(x2 - x1)
+    diff2 = abs(y2 - y1)
+    
+    cross = min(diff1, diff2)
+    straight = max(diff1, diff2) - cross
+    
+    return max(1, cross*3 + straight*2)
 
 def solution(numbers):
-
-    def bfs(idx, L, R, cost):
-        dq = deque()
-        dq.append((idx, L, R, cost))
+    # 숫자마다 xy 위치 구하기
+    xy_board = defaultdict(list)
+    xy_board[0] = [3, 1]
+    for i in range(3):
+        for j in range(3):
+            xy_board[3 * i + j + 1] = [i, j]
+    
+    # dp 초기화
+    dp = defaultdict(lambda: sys.maxsize)
+    dp[(4, 6, 0)] = 0
+    n = len(numbers)
+    
+    # bfs 진행
+    dq = deque([(4, 6, 0)])
+    while dq:
+        left, right, idx = dq.popleft()
+        if idx == n:
+            continue
+            
+        nxt_num = int(numbers[idx])
+        lxy = xy_board[left]
+        rxy = xy_board[right]
+        nxy = xy_board[nxt_num]        
         
-        while dq:
-            ci, cl, cr, cc = dq.popleft()
-
-            if ci == len(numbers): #end
-                return
-
-            GOAL = int(numbers[ci])
-            L_COST = weight(cl, GOAL)
-            R_COST = weight(cr, GOAL)
-
-            #recursive
-            if cr != GOAL:
-                if cc + L_COST < dp[ci][GOAL][cr]: #left
-                    dp[ci][GOAL][cr] = cc + L_COST
-                    dq.append((ci+1, GOAL, cr, cc + L_COST))
-
-            if cl != GOAL:
-                if cc + R_COST < dp[ci][cl][GOAL]: #right
-                    dp[ci][cl][GOAL] = cc + R_COST
-                    dq.append((ci+1, cl, GOAL, cc + R_COST))
-
-    def weight(start, end):
-        start = pad[start]
-        end = pad[end]
-        diff = [abs(end[0]-start[0]), abs(end[1]-start[1])]
-        common = min(diff)
-        other = max(diff)
-        return max(common * 3 + ((other - common) * 2), 1)
-
-    answer = 987654321
-    pad = {0: (4, 2)}
-    INF = 987654321
-    L = 4
-    R = 6
-
-    for i in range(1, 4):
-        for j in range(1, 4):
-            pad[j + ((i-1) * 3)] = (i, j)
-
-    dp = [[[INF for i in range(10)] for j in range(10)] for k in range(len(numbers))]
-
-    bfs(0, L, R, 0)
-
-    end = int(numbers[-1])
+        # 왼손 이동이 가능한 경우
+        if nxt_num != right:
+            new_cost = dp[(left, right, idx)] + cal_weight(lxy, nxy)
+            if new_cost < dp[(nxt_num, right, idx+1)]:
+                dp[(nxt_num, right, idx+1)] = new_cost
+                dq.append((nxt_num, right, idx+1))
+                
+        # 오른쪽 이동이 가능한 경우
+        if nxt_num != left:
+            new_cost = dp[(left, right, idx)] + cal_weight(rxy, nxy)
+            if new_cost < dp[(left, nxt_num, idx+1)]:
+                dp[(left, nxt_num, idx+1)] = new_cost
+                dq.append((left, nxt_num, idx+1))
+                
+    last_num = int(numbers[-1])
+    answer = sys.maxsize
     for i in range(10):
-        answer = min(answer, dp[len(numbers)-1][end][i], dp[len(numbers)-1][i][end])
-
+        answer = min(answer, dp[(last_num, i, n)], dp[(i, last_num, n)])
+        
     return answer
