@@ -71,7 +71,7 @@ def solution(numbers):
     dfs(numbers, 0, 0, left, right)
     return answer
         
-# dp 처리 -> 시간 초과
+# dp 처리
 """
 # dfs로 하면 시간 초과 발생하는 이유
 - dfs를 진행할 경우

@@ -120,47 +120,40 @@ from itertools import combinations, product
 from collections import defaultdict
 
 def solution(dice):
-    # 모든 주사위 play 조합 cnt 저장
-    def play_case(lst):
-        dices = []
-        for num in lst:
-            dices.append(dice[num-1])
-        
-        dict = defaultdict(int)
-        for case in product(*dices):
-            dict[sum(case)] += 1
-    
-        return dict
-            
-    # 해당 케이스 승률 구하기
-    def cal_win(a, b):        
-        a_dict = play_case(a)
-        b_dict = play_case(b)
-        
-        winA = winB = 0
-        for caseA, cntA in a_dict.items():
-            for caseB, cntB in b_dict.items():
-                if caseA > caseB:
-                    winA += cntA * cntB
-                elif caseB > caseA:
-                    winB += cntA * cntB
-        return winA, winB
-    
-    nums = range(1, len(dice)+1)
-    best_case = []
+    dice_num = set(range(1, len(dice) + 1))
     max_win = -1
-    # 주사위 선택 조합 절반만 확인
-    cases = list(combinations(nums, len(dice)//2))
-    real_case = [[cases[i], cases[-1-i]] for i in range(len(cases)//2)]
-    # a, b 승률 모두 구하기
-    for a, b in real_case:
-        winA, winB = cal_win(a, b)
-        
-        if max_win < winA:
-            max_win = winA
-            best_case = a
-        if max_win < winB:
-            max_win = winB
-            best_case = b
+    combi = []
     
-    return sorted(best_case)
+    def play(me, other):
+        me_dict = defaultdict(int)
+        other_dict = defaultdict(int)
+        
+        for case in product(*list(dice[i-1] for i in me)):
+            me_dict[sum(case)] += 1
+        
+        for case in product(*list(dice[i-1] for i in other)):
+            other_dict[sum(case)] += 1
+            
+        me_win = other_win = 0
+        for (mk, mv) in me_dict.items():
+            for (ok, ov) in other_dict.items():
+                if mk > ok:
+                    me_win += mv * ov
+                elif mk < ok:
+                    other_win += mv * ov
+                    
+        is_win = me_win > other_win
+        total_win = me_win if is_win else other_win
+        
+        return [is_win, total_win]
+    
+    for case in combinations(dice_num, len(dice) // 2):
+        me = case
+        other = dice_num - set(case)
+        
+        result, case_win = play(me, other)
+        if case_win > max_win:
+            max_win = case_win
+            combi = me if result else other
+            
+    return sorted(combi)

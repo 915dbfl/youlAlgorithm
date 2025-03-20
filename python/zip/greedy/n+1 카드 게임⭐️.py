@@ -28,6 +28,7 @@ def solution(coin, cards):
     
     def can_remove(s1, s2):
         for num in list(s1):
+            # 모든 것을 확인할 필요 없이 필요한 값이 있는지만 확인하면 됨
             if card_size + 1 - num in s2:
                 s1.remove(num)
                 s2.remove(card_size + 1 - num)

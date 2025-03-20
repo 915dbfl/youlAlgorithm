@@ -69,6 +69,6 @@ def solution(n, m, x, y, r, c, k):
                     if abs(r - nx) + abs(c - ny) + len(route) +1 > k: continue
         
                     dq.append((nx, ny, route + dir_str[i]))
-                    break # 가장 최선의 경우만 선택
+                    break # 가장 최선의 경우만 선택 ⭐️
                     
         return "impossible"
