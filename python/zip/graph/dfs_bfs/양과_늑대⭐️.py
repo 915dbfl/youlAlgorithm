@@ -1,3 +1,44 @@
+# 23분
+from collections import defaultdict, deque
+
+def solution(info, edges):
+    cnt = len(info)
+    graph = defaultdict(list)
+    
+    for a, b in edges:
+        graph[a].append(b)
+        graph[b].append(a)
+    
+    dq = deque()
+    # 현재 노드, 양 수, 늑대 수
+    dq.append((set([0]), 1, 0))
+    
+    answer = 0
+    while dq:
+        group, sheep, wolve = dq.popleft()
+        answer = max(sheep, answer)
+        
+        # 가능한 모든 간선 확인
+        for cur in group:
+            for nxt in graph[cur]:
+                # 방문하지 않았고
+                if nxt not in group:
+                    nsh = sheep
+                    nw = wolve
+                
+                    # 양 / 늑대의 정보 업데이트
+                    if info[nxt] == 1:
+                        nw += 1
+                    else:
+                        nsh += 1
+
+                    # 잡아 먹히지 않을 경우
+                    if nsh > nw:
+                        new_set = group | set([nxt])
+                        dq.append((new_set, nsh, nw))
+
+    return answer
+
 # dfs + backtracking
 # 양방향 경로더라도 불필요하다면 단방향 도로로 생각하기
 # 재풀이 / 35분

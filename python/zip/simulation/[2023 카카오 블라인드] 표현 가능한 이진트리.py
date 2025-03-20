@@ -143,3 +143,32 @@ def solution(numbers):
         result.append(1 if tr else 0)
         
     return result   
+
+# depth를 이요한 풀이
+import math
+
+def dfs(b, i, depth):
+    if depth == 0:
+        return True
+    
+    if b[i] == '0':
+        if b[i - depth] == '1' or b[i + depth] == '1':
+            return False
+        
+    left = dfs(b, i - depth, depth // 2)
+    right = dfs(b, i + depth, depth // 2)
+    return left and right
+
+def solution(numbers):
+    answer = []
+    for num in numbers:
+        b = bin(num)[2:]
+        h = math.ceil(math.log2(len(b) + 1))
+        size = 2**h - 1
+        dummy = size - len(b)
+        b = '0' * dummy + b
+            
+        result = dfs(b, len(b)//2, (len(b) + 1)//4)
+        answer.append(1 if result else 0)
+        
+    return answer

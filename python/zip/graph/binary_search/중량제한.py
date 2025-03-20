@@ -92,3 +92,47 @@ while start <= end:
         end = mid -1
 
 print(result)
+
+# 단순 bfs
+
+"""
+두 공장 사이 무게 제한 최대 경로
+"""
+
+import sys
+from collections import defaultdict, deque
+input = sys.stdin.readline
+
+n, m = map(int, input().split())
+bridges = defaultdict(list)
+weight = [0] * (n+1)
+
+for _ in range(m):
+    a, b, c = map(int, input().split())
+    bridges[a].append((b, c))
+    bridges[b].append((a, c))
+
+f1, f2 = map(int, input().split())
+
+dq = deque()
+weight[f1] = sys.maxsize
+dq.append((f1, sys.maxsize))
+
+# bfs 진행
+while dq:
+    cur, w = dq.popleft()
+
+    if cur == f2:
+        continue
+
+    if weight[cur] > w:
+        continue
+
+    for (nn, nw) in bridges[cur]:
+        new_nw = min(w, nw)
+
+        if weight[nn] < new_nw:
+            weight[nn] = max(new_nw, weight[nn])
+            dq.append((nn, new_nw))
+
+print(weight[f2])

@@ -54,7 +54,7 @@ def solution(alp, cop, problems):
         if cur_alp >= max_alp and cur_cop >= max_cop:
             return cur_cost
         
-        if table[cur_alp][cur_cop] <= cur_cost:
+        if table[cur_alp][cur_cop] >= cur_cost:
             for alp_req, cop_req, alp_rwd, cop_rwd, cost in problems:
                 n_alp = min(150, cur_alp + alp_rwd)
                 n_cop = min(150, cur_cop + cop_rwd)
