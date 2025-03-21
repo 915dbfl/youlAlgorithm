@@ -212,3 +212,54 @@ for i in range(n):
         answer += 1
 
 print(answer)
+
+# dict을 사용한 union find
+
+"""
+- 한붓 그리기
+- 직사각형 그룹화
+"""
+
+import sys
+input = sys.stdin.readline
+
+rec_group = {}
+start_contain = False
+
+# 직사각형 순서에 따라 그룹핑이 달라짐
+n = int(input())
+for i in range(n):
+    x, y, a, b = map(int, input().split())
+
+    # 시작 거북이 포함하는지 확인
+    if ((x == 0 or a == 0) and y<=0<=b) or ((y == 0 or b == 0) and x<=0<=a):
+        start_contain = True
+
+    # 초기 직사각형 넣기
+    if len(rec_group.keys()) == 0:
+        rec_group[i] = [(x, y, a, b)]
+        continue
+
+    # 그룹화 진행
+    new_group = []
+    for group_index in rec_group.keys():
+        for gx, gy, ga, gb in rec_group[group_index]:
+            # 외부에 존재
+            if gx > a or ga < x or b < gy or y > gb:
+                continue
+            # 내부에 존재
+            if (gx < x and (gx < x and a < ga and gy < y and b < gb)) or (gx > x and (x < gx and ga < a and y < gy and gb < b)):
+                continue
+            else:
+                new_group.append(group_index)
+                break
+    
+    grouping = [(x, y, a, b)]
+    for group_index in new_group:
+        grouping += rec_group.get(group_index, [])
+        rec_group.pop(group_index, None)
+
+    rec_group[i] = grouping
+
+group_size = len(rec_group.keys())
+print(group_size - 1 if start_contain else group_size)
