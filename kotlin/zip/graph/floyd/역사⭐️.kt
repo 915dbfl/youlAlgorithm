@@ -14,59 +14,110 @@
 여기서 2, 4의 전후관계는 알 수 없음. 하지만 위상 정렬로 할 경우, -1이 출력됨
  */
 
-import kotlin.collections.ArrayDeque
+// 오답 - 레벨로는 사건 전후 관계를 알 수 없음
 
-lateinit var degree: IntArray
-lateinit var graph: Array<ArrayList<Int>>
+import java.util.*
 
-fun main() = with(System.`in`.bufferedReader()) {
-    val (n, k) = readLine().split(" ").map {it.toInt()}
-    degree = IntArray(n+1)
-    graph = Array(n+1){ArrayList<Int>()}
+private class Solution1613(
+    val n: Int,
+    val degree: IntArray,
+    val child: Array<ArrayList<Int>>,
+) {
+    private val parent = IntArray(n+1) {it}
+    private val level = IntArray(n+1) {Int.MAX_VALUE}
 
-    repeat(k) {
-        val (case1, case2) = readLine().split(" ").map {it.toInt()}
-        degree[case2]++
-        graph[case1].add(case2)
+    init {
+        for (i in 1 until n+1) {
+            // 상위 사건이 없는 경우
+            if (degree[i] == 0) {
+                if (child[i].size > 0) {
+                    // dfs로 level 기록
+                    dfs(i)
+                }
+            }
+        }
     }
 
-    val order = topologicalSort(n)
-    val s = readLine().toInt()
-    repeat(s) {
-        val (case1, case2) = readLine().split(" ").map {it.toInt()}
-        if (order[case1] < order[case2]) {
-            println(-1)
-        } else if(order[case1] > order[case2]) {
-            println(1)
+    private fun find(a: Int): Int {
+        if (parent[a] == a) {
+            return parent[a]
+        }
+        return find(parent[a])
+    }
+
+    private fun union(a: Int, b: Int) {
+        val parentA = find(a)
+        val parentB = find(b)
+
+        if (parentA < parentB) {
+            parent[parentB] = parentA
         } else {
-            println(0)
+            parent[parentA] = parentB
+        }
+    }
+
+    private fun dfs(start: Int) {
+        val deque = ArrayDeque<Int>()
+        deque.add(start)
+        level[start] = 0
+
+        while(!deque.isEmpty()) {
+            val cur = deque.removeFirst()
+
+            for (ch in child[cur]) {
+                if (find(cur) != find(ch)) {
+                    union(cur, ch)
+                }
+                if (level[ch] == Int.MAX_VALUE) {
+                    level[ch] = Math.min(level[ch], level[cur] + 1)
+                    deque.add(ch)
+                }
+            }
+        }
+    }
+
+    fun solve(c1: Int, c2: Int): Int {
+        val parentC1 = find(c1)
+        val parentC2 = find(c2)
+
+        if (parentC1 != parentC2) {
+            return 0
+        } else {
+            return if (level[c1] < level[c2]) {
+                -1
+            } else if (level[c1] == level[c2]) {
+                0
+            } else {
+                1
+            }
         }
     }
 }
 
-fun topologicalSort(n: Int): IntArray {
-    val dq = ArrayDeque<Pair<Int, Int>>()
-    val order = IntArray(n+1)
+fun main() = with(System.`in`.bufferedReader()) {
+    var tokenizer = StringTokenizer(readLine())
+    val n = tokenizer.nextToken().toInt()
+    val k = tokenizer.nextToken().toInt()
+    val degree = IntArray(n+1)
+    val child: Array<ArrayList<Int>> = Array(n+1) {arrayListOf<Int>()}
 
-    for (i in 1..n) {
-        if (degree[i] == 0) {
-            dq.add(i to 0)
-        }
+    repeat(k) {
+        tokenizer = StringTokenizer(readLine())
+        val before = tokenizer.nextToken().toInt()
+        val after = tokenizer.nextToken().toInt()
+        degree[after] += 1
+        child[before].add(after)
     }
 
-    while(dq.isNotEmpty()) {
-        val cur = dq.removeFirst()
-        order[cur.first] = cur.second
+    val solution1613 = Solution1613(n, degree, child)
+    val s = readLine().toInt()
+    repeat(s) {
+        tokenizer = StringTokenizer(readLine())
+        val c1 = tokenizer.nextToken().toInt()
+        val c2 = tokenizer.nextToken().toInt()
 
-        for (nxt in graph[cur.first]) {
-            degree[nxt]--
-            if (degree[nxt] == 0) {
-                dq.add(nxt to cur.second+1)
-            }
-        } 
+        println(solution1613.solve(c1, c2))
     }
-
-    return order
 }
 
 // 일일히 bfs로 확인하기
